@@ -1,0 +1,59 @@
+#%RAML 1.0
+title: rom-prueba-mulesoft-sys-api
+version: v1
+baseUri: http://rom-prueba-mulesoft-sys-api/api/v1
+
+types:
+  User: !include datatypes/user.raml
+  Message: !include datatypes/message.raml
+
+/users:
+  get:
+    description: "Get all users"
+    displayName: "Get Users"
+    responses:
+      200:
+        headers:
+          content-type:
+            example: "application/json"
+        body:
+          application/json:
+            type: User[]
+            example: !include examples/all-users.json
+
+  /{id}:
+    description: A specific User by ID
+    uriParameters:
+     id:
+       description: A specific User by ID
+       type: integer
+       example: 1
+    get:
+      description: "Get User by ID"
+      displayName: "Get User by ID"
+      responses:
+        200:
+          headers:
+            content-type:
+              example: "application/json"
+          body:
+            application/json:
+              type: User
+              example: !include examples/user-by-id.json
+
+  post:
+    description: "Create a new User"
+    displayName: "Create User"
+    body:
+      application/json:
+        type: User
+        example: !include examples/request-new-user.json
+    responses:
+      201:
+        headers:
+          content-type:
+            example: "application/json"
+        body:
+          application/json:
+            type: Message
+            example: !include examples/response-new-user.json
