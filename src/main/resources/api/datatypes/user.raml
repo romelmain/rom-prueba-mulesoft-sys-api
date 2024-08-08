@@ -3,7 +3,10 @@ type: object
 properties:
   id?: number
   userName: string
-  email: string
+  email:
+    type: string
+    pattern: ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$
+    example: "romelherreratgk@gmail.com"      
   name: string
   lastname: string
   password?: string
