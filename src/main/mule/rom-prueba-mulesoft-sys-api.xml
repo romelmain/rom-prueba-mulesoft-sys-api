@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <apikit:config name="rom-prueba-mulesoft-sys-api-config" api="rom-prueba-mulesoft-sys-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="rom-prueba-mulesoft-sys-api-config" api="rom-prueba-mulesoft-sys-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus"/>
     <flow name="rom-prueba-mulesoft-sys-api-main">
         <http:listener path="${api.path}" config-ref="HTTP_Listener_config">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -94,10 +94,10 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\albums:rom-prueba-mulesoft-sys-api-config">
-		<flow-ref doc:name="getAlbumsFlow" doc:id="4566d1c1-37cd-4ecc-aaf6-7263113d81b7" name="getAlbumsFlow"/>
+		<flow-ref doc:name="getAlbumsFlow" doc:id="049ad7aa-ce7b-41a4-b26c-536f31dc09f3" name="getAlbumsFlow"/>
     </flow>
     <flow name="get:\users:rom-prueba-mulesoft-sys-api-config">
-		<flow-ref doc:name="getUsersFlow" doc:id="426418cd-e4ac-4040-80c9-17092702992d" name="getUsersFlow"/>
+		<flow-ref doc:name="getUsersFlow" doc:id="1efa4448-7491-499b-85ec-59ce3e05328b" name="getUsersFlow"/>
     </flow>
     <flow name="get:\users\(id):rom-prueba-mulesoft-sys-api-config">
         <ee:transform doc:name="Set ID">
@@ -105,9 +105,9 @@ output application/json
                 <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-		<flow-ref doc:name="getUserByIdFlow" doc:id="146fcbf5-a791-4839-acfd-0e104dd3d34f" name="getUserByIdFlow"/>
+		<flow-ref doc:name="getUserByIdFlow" doc:id="57dbd196-4f7b-4399-aac3-ee2e32835aa2" name="getUserByIdFlow"/>
     </flow>
     <flow name="post:\users:application\json:rom-prueba-mulesoft-sys-api-config">
-		<flow-ref doc:name="createNewUserFlow" doc:id="30f7322a-42fe-4bf9-8301-f1359df572d0" name="createNewUserFlow"/>
+		<flow-ref doc:name="createNewUserFlow" doc:id="99b38c1b-0adb-4e46-bc87-22eabf282bfa" name="createNewUserFlow"/>
     </flow>
 </mule>

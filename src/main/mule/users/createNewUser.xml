@@ -7,10 +7,12 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="createNewUserFlow" doc:id="83520c44-2cf7-4dc4-a638-b2c437503f9d" >
 		<logger level="INFO" doc:name="Start createNewUserFlow" doc:id="0f4065e1-5636-4309-93ab-48e88a02467e" message="Start createNewUserFlow"/>
-		<db:insert doc:name="Insert" doc:id="a13234ac-710b-4a16-bd97-2b24173ce73b" config-ref="Database_Config" autoGenerateKeys="true">
-			<db:sql ><![CDATA[insert into user (username,email,name,lastname,password) values (:userName,:email,:name,:lastname,:password)
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="2f23b932-fda6-400f-b5ca-54a3644fa30b" >
+			<try doc:name="Try" doc:id="305e91dd-8679-47f5-a846-9b125f91d7d8" >
+				<db:insert doc:name="Insert" doc:id="a13234ac-710b-4a16-bd97-2b24173ce73b" config-ref="Database_Config" autoGenerateKeys="true">
+			<db:sql><![CDATA[insert into user (username,email,name,lastname,password) values (:userName,:email,:name,:lastname,:password)
 ]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{
+			<db:input-parameters><![CDATA[#[{
 	"userName": payload.userName,
 	"email": payload.email,
 	"name": payload.name,
@@ -18,14 +20,49 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	"password": payload.password
 }]]]></db:input-parameters>
 		</db:insert>
-		<ee:transform doc:name="Transform Message" doc:id="dffe3b62-1fd0-4a7a-8492-35ebe735a301" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f19f0da2-00db-4529-b6b5-c2c19d442d6b" >
+						<ee:transform doc:name="Set Error" doc:id="8de6bc20-ad20-49fe-a9f6-ceae9c1d6c49" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</on-error-propagate>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="e6dd05fa-c7cd-4825-b9ab-c56468273cc5" >
+			<when expression='#[payload.generatedKeys."last_insert_rowid()" &gt; 0]'>
+				<ee:transform doc:name="Set Final Response" doc:id="dffe3b62-1fd0-4a7a-8492-35ebe735a301">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{"code": 201, 
+"message": "User created successfully with id = " ++ payload.affectedRows
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Failed Create User" doc:id="d4176f99-a736-439e-be30-932178b97cea" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{"code": 500, 
+"message": "Failed to create User"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="End createNewUserFlow" doc:id="8bcd6b02-873b-4537-becd-5879a635166f" message="End createNewUserFlow"/>
 	</flow>
 </mule>

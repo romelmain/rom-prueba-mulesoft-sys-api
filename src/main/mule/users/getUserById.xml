@@ -7,20 +7,65 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="getUserByIdFlow" doc:id="eda8f624-19a4-4f38-8c1e-4ffd6527fa3c" >
 		<logger level="INFO" doc:name="Start getUserByIdFlow" doc:id="4166345e-449b-4938-892f-44b05004a822" message="Start getUserByIdFlow"/>
-		<db:select doc:name="Select" doc:id="292d70d5-416c-4d26-bc63-6d7248de3b27" config-ref="Database_Config">
-			<db:sql ><![CDATA[select * from user where id = :id]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{
+		<until-successful maxRetries="${until.successful.maxretries}" doc:name="Until Successful" doc:id="6c0f0966-e15f-41e2-b421-a0fb8030bce7" millisBetweenRetries="${until.successful.timebetween}">
+			<try doc:name="Try" doc:id="438bd672-e7e0-47f4-8bd0-b9afce0fa8f2" >
+				<db:select doc:name="Select" doc:id="292d70d5-416c-4d26-bc63-6d7248de3b27" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from user where id = :id]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
 	"id": vars.id
 }]]]></db:input-parameters>
 		</db:select>
-		<ee:transform doc:name="Transform Message" doc:id="b0c5fe63-3dcb-4844-8a74-ce9260bf1da1" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="42551734-564a-4816-91b7-cff557c7f280" >
+						<ee:transform doc:name="Set Error" doc:id="a5bfac91-eced-433f-a037-5fe1b4c457ed" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</on-error-propagate>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="c5de0c1e-4da9-4223-a891-3d27cc054ca9">
+			<when expression="#[sizeOf(payload) == 1]">
+				<ee:transform doc:name="Set Final Response" doc:id="b0c5fe63-3dcb-4844-8a74-ce9260bf1da1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-payload]]></ee:set-payload>
+payload map ((item, index) -> 
+{
+    "id": item.id,
+    "userName": item.username,
+    "name": item.name,
+    "lastname": item.lastname,
+    "email": item.email
+}
+)]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="User Not Found" doc:id="684bad5f-23ad-4694-ad37-fdc6bc8dadd8">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{"code": 404, 
+"message": "User Not Found"
+}
+]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="End getUserByIdFlow" doc:id="5acb69dd-a331-4e1b-bec3-d4f122f59ed8" message="End getUserByIdFlow"/>
 	</flow>
 </mule>

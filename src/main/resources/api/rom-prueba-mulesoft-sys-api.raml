@@ -8,8 +8,34 @@ types:
   Message: !include datatypes/message.raml
   Album: !include datatypes/album.raml
 
+securitySchemes:
+  oauth_2_0:
+        description: |
+            Mule OAuth 2.0.
+        type: OAuth 2.0
+        describedBy:
+            headers:
+                Authorization:
+                    description: |
+                      Used to send a valid OAuth 2 access token. Do not use
+                      with the "access_token" query string parameter.
+                    type: string
+                        
+            responses:
+                401:
+                    description: |
+                        Bad or expired token.
+                403:
+                    description: |
+                        Bad OAuth request.
+        settings:
+          authorizationUri: http://0.0.0.0:8081/authorize
+          accessTokenUri: http://0.0.0.0:8081/access-token
+          authorizationGrants: [authorization_code, password, client_credentials, implicit]
+
 /users:
   get:
+    securedBy: [oauth_2_0]
     description: "Get all users"
     displayName: "Get Users"
     responses:
@@ -30,6 +56,7 @@ types:
        type: integer
        example: 1
     get:
+      securedBy: [oauth_2_0]
       description: "Get User by ID"
       displayName: "Get User by ID"
       responses:
@@ -43,6 +70,7 @@ types:
               example: !include examples/user-by-id.json
 
   post:
+    securedBy: [oauth_2_0]
     description: "Create a new User"
     displayName: "Create User"
     body:
@@ -61,6 +89,7 @@ types:
 
 /albums:
   get:
+    securedBy: [oauth_2_0]
     description: "Get all albums"
     displayName: "Get Albums"
     responses:

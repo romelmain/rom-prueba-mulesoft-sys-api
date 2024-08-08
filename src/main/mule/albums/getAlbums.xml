@@ -7,15 +7,50 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="getAlbumsFlow" doc:id="53c6e497-e7ee-4f7c-ae4e-2e97561e4175" >
 		<logger level="INFO" doc:name="Start getAlbumsFlow" doc:id="704efd0a-0ad6-4719-89ed-d4edaf6abfb3" message="Start getAlbumsFlow"/>
-		<http:request method="GET" doc:name="Request" doc:id="c7e25d61-01d5-47b6-9925-a02c82e10df9" config-ref="HTTP_Request_configuration" path="/albums"/>
-		<ee:transform doc:name="Transform Message" doc:id="4d4601b5-f76b-47d8-a783-1264365d2aa0" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<until-successful maxRetries="${until.successful.maxretries}" doc:name="Until Successful" doc:id="989ed457-dc7b-4628-bebf-8beb8eaa2093" millisBetweenRetries="${until.successful.timebetween}">
+			<try doc:name="Try" doc:id="21fbeb44-8d6e-4500-9394-d92ca0718a40" >
+				<http:request method="GET" doc:name="Request" doc:id="c7e25d61-01d5-47b6-9925-a02c82e10df9" config-ref="HTTP_Request_configuration" path="/albums" />
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7eb4c75f-d363-4b15-a99c-83faf4bcead5" >
+						<ee:transform doc:name="Set Error" doc:id="92ae1a6a-85d2-468e-a2fb-3741d21b09cc" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+							</ee:message>
+						</ee:transform>
+					</on-error-propagate>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="f73c8e74-aa35-4b01-a90e-c54656df02a7">
+			<when expression="#[sizeOf(payload) &gt; 0]">
+				<ee:transform doc:name="Set Final Response" doc:id="7e98c754-e581-4530-9a16-e95b8cc3ac14">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Empty Response" doc:id="7c4862d2-c6c8-4a31-a20a-1408297b9ee0">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/son
+---
+{"code": 404, 
+"message": "empty albums list"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="End getAlbumsFlow" doc:id="35792c18-cca5-4be5-996d-ea941e7f2ae8" message="End getAlbumsFlow"/>
 	</flow>
 </mule>

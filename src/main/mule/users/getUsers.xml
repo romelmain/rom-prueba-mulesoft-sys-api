@@ -7,17 +7,60 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<flow name="getUsersFlow" doc:id="3c83ee30-cc13-4cd2-bdca-94edefca44fb" >
 		<logger level="INFO" doc:name="Start getUsersFlow" doc:id="9b4bf2d1-0a96-4507-a34c-a7675f6ab394" message="Start getUsersFlow"/>
-		<db:select doc:name="Select" doc:id="7e913889-2d3f-4e15-b035-46ae4aeb91b0" config-ref="Database_Config">
-			<db:sql ><![CDATA[select * from user]]></db:sql>
+		<until-successful maxRetries="${until.successful.maxretries}" doc:name="Until Successful" doc:id="46213310-3bce-4bde-8373-123bc796787d" millisBetweenRetries="${until.successful.timebetween}">
+			<try doc:name="Try" doc:id="1cf62ed5-6a9d-4389-b35c-fd37d9296cbe" >
+				<db:select doc:name="Select" doc:id="7e913889-2d3f-4e15-b035-46ae4aeb91b0" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from user]]></db:sql>
 		</db:select>
-		<ee:transform doc:name="Transform Message" doc:id="4ad6ac4a-72d7-4b45-8a76-fbb97b582409" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="55442435-1f78-4027-9b69-72d068018e9e" >
+						<ee:transform doc:name="Set Error" doc:id="497a33e5-4060-4be1-871b-35cd69c7b77b" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+							</ee:message>
+						</ee:transform>
+					</on-error-propagate>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="e5fb6f59-c2fc-4523-9601-1ab966ac90ef">
+			<when expression="#[sizeOf(payload) &gt; 0]">
+				<ee:transform doc:name="Set Final Response" doc:id="0523a836-cfae-45d2-847c-66640a671da1">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ((item, index) -> 
+{
+    "id": item.id,
+    "userName": item.username,
+    "name": item.name,
+    "lastname": item.lastname,
+    "email": item.email
+}
+)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Empty Response" doc:id="e2b948e0-2895-4d76-bee1-fdc30b1b8285">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/son
+---
+{"code": 404, 
+"message": "empty users list"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
 		<logger level="INFO" doc:name="End getUsersFlow" doc:id="91a59307-2da1-46fb-8c11-9928fe1a4c75" message="End getUsersFlow"/>
 	</flow>
 </mule>
