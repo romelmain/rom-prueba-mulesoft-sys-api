@@ -13,13 +13,17 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 			<db:sql><![CDATA[select * from user]]></db:sql>
 		</db:select>
 				<error-handler >
-					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="55442435-1f78-4027-9b69-72d068018e9e" >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="55442435-1f78-4027-9b69-72d068018e9e" type="DB:BAD_SQL_SYNTAX, DB:CONNECTIVITY, DB:QUERY_EXECUTION">
+						<ee:transform doc:name="Set Status" doc:id="408e55e7-a9d2-4676-b50f-b9e6dfabdfdd" >
+							<ee:message >
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
 						<ee:transform doc:name="Set Error" doc:id="497a33e5-4060-4be1-871b-35cd69c7b77b" >
 							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-payload]]></ee:set-payload>
+								<ee:set-payload resource="dwl/errorMessage.dwl" />
 							</ee:message>
 						</ee:transform>
 					</on-error-propagate>
@@ -46,14 +50,22 @@ payload map ((item, index) ->
 				</ee:transform>
 			</when>
 			<otherwise>
+				<ee:transform doc:name="Set Status" doc:id="351a5ce0-2dc8-4cee-8dbe-17af6ae236a2">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
 				<ee:transform doc:name="Empty Response" doc:id="e2b948e0-2895-4d76-bee1-fdc30b1b8285">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
-output application/son
+output application/json
 ---
-{"code": 404, 
-"message": "empty users list"
-}]]></ee:set-payload>
+{"code": vars.httpStatus, 
+"message": p('message.getUsers.failed')
+}
+]]></ee:set-payload>
 					</ee:message>
 					<ee:variables>
 						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>

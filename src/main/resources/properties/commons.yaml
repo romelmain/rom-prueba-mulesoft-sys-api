@@ -1,0 +1,13 @@
+message:
+  getUsers:
+    success: ""
+    failed: ""
+  getUsersById:
+    success: ""
+    failed: "User Not Found"
+  newUser:
+    success: "User created successfully with id = "
+    failed: "Failed to create User"
+  albums:
+    success: ""
+    failed: "Empty Albums List"

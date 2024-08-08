@@ -7,3 +7,8 @@ until:
   successful:
     maxretries: "3"
     timebetween: "5000"
+    
+# jsonplaceholder
+request:
+  host: "jsonplaceholder.typicode.com"
+  port: ""

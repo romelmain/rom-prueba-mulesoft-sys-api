@@ -16,14 +16,17 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 }]]]></db:input-parameters>
 		</db:select>
 				<error-handler >
-					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="42551734-564a-4816-91b7-cff557c7f280" >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="42551734-564a-4816-91b7-cff557c7f280" type="DB:BAD_SQL_SYNTAX, DB:CONNECTIVITY, DB:QUERY_EXECUTION">
+						<ee:transform doc:name="Set Status" doc:id="6297429a-9572-4830-8543-14ccdd99dddb" >
+							<ee:message >
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
 						<ee:transform doc:name="Set Error" doc:id="a5bfac91-eced-433f-a037-5fe1b4c457ed" >
 							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-}]]></ee:set-payload>
+								<ee:set-payload resource="dwl/errorMessage.dwl" />
 							</ee:message>
 						</ee:transform>
 					</on-error-propagate>
@@ -36,8 +39,8 @@ output application/java
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
----
-payload map ((item, index) -> 
+
+var userList = payload map ((item, index) -> 
 {
     "id": item.id,
     "userName": item.username,
@@ -45,18 +48,27 @@ payload map ((item, index) ->
     "lastname": item.lastname,
     "email": item.email
 }
-)]]></ee:set-payload>
+)
+---
+userList[0]]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 			</when>
 			<otherwise>
+				<ee:transform doc:name="Set Status" doc:id="b78cf268-30c2-41e6-b43a-5eb82f231da6">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
 				<ee:transform doc:name="User Not Found" doc:id="684bad5f-23ad-4694-ad37-fdc6bc8dadd8">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{"code": 404, 
-"message": "User Not Found"
+{"code": vars.httpStatus, 
+"message": p('message.getUsersById.failed')
 }
 ]]></ee:set-payload>
 					</ee:message>
