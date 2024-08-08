@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getAlbumsFlow" doc:id="53c6e497-e7ee-4f7c-ae4e-2e97561e4175" >
+		<logger level="INFO" doc:name="Start getAlbumsFlow" doc:id="704efd0a-0ad6-4719-89ed-d4edaf6abfb3" message="Start getAlbumsFlow"/>
+		<http:request method="GET" doc:name="Request" doc:id="c7e25d61-01d5-47b6-9925-a02c82e10df9" config-ref="HTTP_Request_configuration" path="/albums"/>
+		<ee:transform doc:name="Transform Message" doc:id="4d4601b5-f76b-47d8-a783-1264365d2aa0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End getAlbumsFlow" doc:id="35792c18-cca5-4be5-996d-ea941e7f2ae8" message="End getAlbumsFlow"/>
+	</flow>
+</mule>

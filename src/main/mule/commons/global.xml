@@ -13,4 +13,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="03922304-2d9d-43fb-b8fe-c92fcd6f58e8" >
 		<db:generic-connection url="jdbc:sqlite:${mule.home}/apps/${app.name}/UsersDB.db" driverClassName="org.sqlite.JDBC" />
 	</db:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="1e642aea-9212-42f9-b309-314db41ec165" >
+		<http:request-connection protocol="HTTPS" host="jsonplaceholder.typicode.com" />
+	</http:request-config>
 </mule>

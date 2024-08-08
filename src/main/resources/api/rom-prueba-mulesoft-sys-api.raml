@@ -6,6 +6,7 @@ baseUri: http://rom-prueba-mulesoft-sys-api/api/v1
 types:
   User: !include datatypes/user.raml
   Message: !include datatypes/message.raml
+  Album: !include datatypes/album.raml
 
 /users:
   get:
@@ -57,3 +58,21 @@ types:
           application/json:
             type: Message
             example: !include examples/response-new-user.json
+
+/albums:
+  get:
+    description: "Get all albums"
+    displayName: "Get Albums"
+    responses:
+      200:
+        headers:
+          content-type:
+            example: "application/json"
+        body:
+          application/json:
+            type: Album[]
+            example: !include examples/all-albums.json
+              
+              
+
+

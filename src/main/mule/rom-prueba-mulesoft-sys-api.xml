@@ -93,8 +93,11 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
+    <flow name="get:\albums:rom-prueba-mulesoft-sys-api-config">
+		<flow-ref doc:name="getAlbumsFlow" doc:id="4566d1c1-37cd-4ecc-aaf6-7263113d81b7" name="getAlbumsFlow"/>
+    </flow>
     <flow name="get:\users:rom-prueba-mulesoft-sys-api-config">
-		<flow-ref doc:name="getUsersFlow" doc:id="46536d48-f80b-469c-aebb-64263c4281c9" name="getUsersFlow"/>
+		<flow-ref doc:name="getUsersFlow" doc:id="426418cd-e4ac-4040-80c9-17092702992d" name="getUsersFlow"/>
     </flow>
     <flow name="get:\users\(id):rom-prueba-mulesoft-sys-api-config">
         <ee:transform doc:name="Set ID">
@@ -102,9 +105,9 @@ output application/json
                 <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-		<flow-ref doc:name="getUserByIdFlow" doc:id="83934a7a-5021-413b-8901-05933f6dee3f" name="getUserByIdFlow"/>
+		<flow-ref doc:name="getUserByIdFlow" doc:id="146fcbf5-a791-4839-acfd-0e104dd3d34f" name="getUserByIdFlow"/>
     </flow>
     <flow name="post:\users:application\json:rom-prueba-mulesoft-sys-api-config">
-		<flow-ref doc:name="createNewUserFlow" doc:id="30e15c21-6d8f-4ec4-ab71-21e6d36baac5" name="createNewUserFlow"/>
+		<flow-ref doc:name="createNewUserFlow" doc:id="30f7322a-42fe-4bf9-8301-f1359df572d0" name="createNewUserFlow"/>
     </flow>
 </mule>
