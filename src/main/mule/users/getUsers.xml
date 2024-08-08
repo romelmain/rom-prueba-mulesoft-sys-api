@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="getUsersFlow" doc:id="3c83ee30-cc13-4cd2-bdca-94edefca44fb" >
+		<logger level="INFO" doc:name="Start getUsersFlow" doc:id="9b4bf2d1-0a96-4507-a34c-a7675f6ab394" message="Start getUsersFlow"/>
+		<db:select doc:name="Select" doc:id="7e913889-2d3f-4e15-b035-46ae4aeb91b0" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from user]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="4ad6ac4a-72d7-4b45-8a76-fbb97b582409" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End getUsersFlow" doc:id="91a59307-2da1-46fb-8c11-9928fe1a4c75" message="End getUsersFlow"/>
+	</flow>
+</mule>

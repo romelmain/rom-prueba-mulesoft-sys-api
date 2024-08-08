@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="createNewUserFlow" doc:id="83520c44-2cf7-4dc4-a638-b2c437503f9d" >
+		<logger level="INFO" doc:name="Start createNewUserFlow" doc:id="0f4065e1-5636-4309-93ab-48e88a02467e" message="Start createNewUserFlow"/>
+		<db:insert doc:name="Insert" doc:id="a13234ac-710b-4a16-bd97-2b24173ce73b" config-ref="Database_Config" autoGenerateKeys="true">
+			<db:sql ><![CDATA[insert into user (username,email,name,lastname,password) values (:userName,:email,:name,:lastname,:password)
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"userName": payload.userName,
+	"email": payload.email,
+	"name": payload.name,
+	"lastname": payload.lastname,
+	"password": payload.password
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="dffe3b62-1fd0-4a7a-8492-35ebe735a301" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End createNewUserFlow" doc:id="8bcd6b02-873b-4537-becd-5879a635166f" message="End createNewUserFlow"/>
+	</flow>
+</mule>

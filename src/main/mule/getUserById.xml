@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getUserByIdFlow" doc:id="eda8f624-19a4-4f38-8c1e-4ffd6527fa3c" >
+		<logger level="INFO" doc:name="Start getUserByIdFlow" doc:id="4166345e-449b-4938-892f-44b05004a822" message="Start getUserByIdFlow"/>
+		<db:select doc:name="Select" doc:id="292d70d5-416c-4d26-bc63-6d7248de3b27" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from user where id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"id": vars.id
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="b0c5fe63-3dcb-4844-8a74-ce9260bf1da1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End getUserByIdFlow" doc:id="5acb69dd-a331-4e1b-bec3-d4f122f59ed8" message="End getUserByIdFlow"/>
+	</flow>
+</mule>
