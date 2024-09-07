@@ -19,7 +19,7 @@ Para poder conectarse a la base de datos se necesita la libreria sqlite-jdbc la 
 
 El Api tambien hace una petición a otra Api externa a https://jsonplaceholder.typicode.com/
 
-Los parámetros de configuración y mensajes están definidos en los archivo app.yaml y commons.yaml en la ruta main/resource/prperties
+Los parámetros de configuración y mensajes están definidos en los archivo app.yaml y commons.yaml en la ruta main/resource/properties
 
 Para indicar el entorno en el que se va a ejecutar el Api, se debe usar la variable mule.env definida en Run configurations
 
